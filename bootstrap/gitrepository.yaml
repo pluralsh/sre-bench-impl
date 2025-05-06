@@ -1,0 +1,7 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: GitRepository
+metadata:
+  name: sre-bench
+  namespace: sre-bench
+spec:
+  url: https://github.com/pluralsh/sre-bench-impl.git

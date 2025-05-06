@@ -33,10 +33,10 @@ jobs:
 
       - name: login to dockerhub using helm
         run: |
-          echo ${{ secrets.DOCKERHUB_TOKEN }} | helm registry login registry-1.docker.io --username pluralsh --password-stdin
-      - name: ensure temlatability
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+      - name: ensure templatability
         run: helm template charts/${{ matrix.charts }}
       - name: package
         run: helm package charts/${{ matrix.charts }}
       - name: push
-        run: helm push ${{ matrix.charts }}-${{ steps.vsn.outputs.vsn }}.tgz oci://registry-1.docker.io/pluralsh/sre-bench
+        run: helm push ${{ matrix.charts }}-${{ steps.vsn.outputs.vsn }}.tgz oci://ghcr.io/pluralsh/sre-bench/charts

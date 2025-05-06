@@ -1,0 +1,42 @@
+name: Publish Charts
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  publish-charts:
+    name: publish to dockerhub
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+      packages: "write"
+    strategy:
+      matrix:
+        charts:
+        - stateless
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout repo
+
+      - name: install helm
+        uses: Azure/setup-helm@v1
+        with:
+          version: v3.11.2
+
+      - id: vsn
+        name: get chart version
+        run: |
+          echo "vsn=$(grep -oP 'version:\s*\K[^ ]+' charts/${{ matrix.charts }}/Chart.yaml)" >> "$GITHUB_OUTPUT"
+
+      - name: login to dockerhub using helm
+        run: |
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | helm registry login registry-1.docker.io --username pluralsh --password-stdin
+      - name: ensure temlatability
+        run: helm template charts/${{ matrix.charts }}
+      - name: package
+        run: helm package charts/${{ matrix.charts }}
+      - name: push
+        run: helm push ${{ matrix.charts }}-${{ steps.vsn.outputs.vsn }}.tgz oci://registry-1.docker.io/pluralsh/sre-bench

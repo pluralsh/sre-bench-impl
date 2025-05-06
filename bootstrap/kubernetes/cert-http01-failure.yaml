@@ -1,0 +1,21 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: ServiceDeployment
+metadata:
+  name: cert-http01
+spec:
+  namespace: cert-http01
+  git:
+    ref: main
+    folder: helm
+  helm:
+    chart: stateless
+    version: x.x.x
+    url: https://pluralsh.github.io/bootstrap
+    valuesFiles:
+    - cert-http01.yaml
+  repositoryRef:
+    name: sre-bench
+    namespace: sre-bench
+  clusterRef:
+    name: test
+    namespace: sre-bench

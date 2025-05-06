@@ -1,0 +1,15 @@
+ingress:
+  enabled: true
+  className: nginx-internal
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+  - host: sre-bench.dev.plural.sh
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - secretName: sre-bench-tls
+    hosts:
+      - sre-bench.dev.plural.sh

@@ -1,0 +1,21 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: ServiceDeployment
+metadata:
+  name: cert-r53
+spec:
+  namespace: cert-r53
+  git:
+    ref: main
+    folder: helm
+  helm:
+    chart: stateless
+    version: x.x.x
+    url: https://pluralsh.github.io/bootstrap
+    valuesFiles:
+    - cert-r53.yaml
+  repositoryRef:
+    name: sre-bench
+    namespace: sre-bench
+  clusterRef:
+    name: test
+    namespace: sre-bench

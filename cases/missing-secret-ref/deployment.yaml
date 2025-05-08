@@ -17,7 +17,7 @@ spec:
           image: nginx:latest
           envFrom:
             - secretRef:
-                name: missing-secret
+                name: some-secret
           ports:
             - containerPort: 80
           resources:

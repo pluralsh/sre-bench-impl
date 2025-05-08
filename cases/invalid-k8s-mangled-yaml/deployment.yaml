@@ -13,29 +13,31 @@ spec:
         app: nginx
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-        env:
-        - name: API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-secrets
-              key: api-key
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: url
-        - name: CACHE_HOST
-          valueFrom:
-            secretKeyRef:
-              name: cache-secrets
-      - name: sidecar
-        image: busybox::latest
-        imagePullPolicy: Sometimes
-        resources:
-          limts: 
-            memory: 128Mi
-            cpu: 100mm 
+        - name: nginx
+          image: nginx:latest
+          envFrom:
+            - secretRef:
+                name: example-secret
+            - secretRef:
+              name: another-secret
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10

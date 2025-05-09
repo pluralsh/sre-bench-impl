@@ -1,0 +1,15 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: ServiceDeployment
+metadata:
+  name: nginx-test-3
+spec:
+  namespace: nginx-test-3
+  repositoryRef:
+    name: sre-bench
+    namespace: sre-bench
+  clusterRef:
+    name: test
+    namespace: sre-bench
+  git:
+    ref: main
+    folder: cases/k8s-mangled-yaml

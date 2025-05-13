@@ -1,0 +1,22 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: InfrastructureStack
+metadata:
+  name: terraform-insufficient-aws-iam-permissions
+  namespace: sre-bench-terraform-01
+spec:
+  detach: false
+  type: TERRAFORM
+  approval: true
+  manageState: true
+  actor: console@plural.sh
+  git:
+    ref: main
+    folder: cases/terraform-insufficient-aws-iam-permissions
+  repositoryRef:
+    name: sre-bench
+    namespace: sre-bench
+  clusterRef:
+    name: test
+    namespace: sre-bench
+  configuration:
+    version: '1.8'

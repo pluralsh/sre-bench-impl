@@ -2,7 +2,7 @@ apiVersion:apiVersion: deployments.plural.sh/v1alpha1
 kind: InfrastructureStack
 metadata:
   name: terraform-aws-quota-exceeded
-  namespace: sre-bench-terraform-03
+  namespace: sre-bench-terraform-02
 spec:
   detach: false
   type: TERRAFORM

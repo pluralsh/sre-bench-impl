@@ -1,0 +1,22 @@
+apiVersion:apiVersion: deployments.plural.sh/v1alpha1
+kind: InfrastructureStack
+metadata:
+  name: terraform-aws-quota-exceeded
+  namespace: sre-bench-terraform-02
+spec:
+  detach: false
+  type: TERRAFORM
+  approval: true
+  manageState: true
+  actor: console@plural.sh
+  git:
+    ref: main
+    folder: cases/terraform-aws-quota-exceeded
+  repositoryRef:
+    name: sre-bench
+    namespace: sre-bench
+  clusterRef:
+    name: test
+    namespace: sre-bench
+  configuration:
+    version: '1.8'

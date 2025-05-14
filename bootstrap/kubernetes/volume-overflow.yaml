@@ -1,9 +1,9 @@
 apiVersion: deployments.plural.sh/v1alpha1
 kind: ServiceDeployment
 metadata:
-  name: nginx-test-5
+  name: volume-overflow
 spec:
-  namespace: nginx-test-5
+  namespace: volume-overflow
   repositoryRef:
     name: sre-bench
     namespace: sre-bench
@@ -12,4 +12,4 @@ spec:
     namespace: sre-bench
   git:
     ref: main
-    folder: cases/missing-secret-ref
+    folder: cases/volume-overflow

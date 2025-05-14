@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage-app
+  namespace: storage-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storage-app
+  template:
+    metadata:
+      labels:
+        app: storage-app
+    spec:
+      containers:
+      - name: storage-app
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - while true; do
+            dd if=/dev/zero of=/data/testfile bs=1M count=100;
+            sleep 2;
+          done
+        volumeMounts:
+        - name: storage-volume
+          mountPath: /data
+      volumes:
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: storage-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: storage-pvc
+  namespace: storage-test
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+

@@ -4,4 +4,4 @@ metadata:
   name: test-storage
 provisioner: ebs.csi.aws.com
 parameters:
-  type: gp3
+  type: fake-storage-type

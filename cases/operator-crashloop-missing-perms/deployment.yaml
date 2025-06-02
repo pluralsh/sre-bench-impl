@@ -1,42 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: {{ include "stateless.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "stateless.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app.kubernetes.io/name: {{ include "stateless.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: nginx
+        app.kubernetes.io/name: {{ include "stateless.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        sidecar.istio.io/inject: "true"  # This will trigger sidecar injection
     spec:
-      serviceAccountName: nginx-sa
+      serviceAccountName: {{ include "stateless.serviceAccountName" . }}
       containers:
-        - name: nginx
-          image: nginx:latest
-          envFrom:
-            - secretRef:
-                name: some-secret
-          ports:
-            - containerPort: 80
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 256Mi
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 10
+      - name: example-app
+        image: nginx:latest
+        ports:
+        - name: http
+          containerPort: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: example-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example-virtualservice
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - example-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: {{ include "stateless.fullname" . }}  # Using the stateless service name
+        port:
+          number: {{ .Values.service.port }}

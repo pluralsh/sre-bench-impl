@@ -1,9 +1,9 @@
 apiVersion: deployments.plural.sh/v1alpha1
 kind: ServiceDeployment
 metadata:
-  name: operator-crashloop-missing-perms
+  name: istio-operator-missing-perms
 spec:
-  namespace: operator-crashloop-missing-perms
+  namespace: istio-operator-missing-perms
   git:
     ref: main
     folder: cases/operator-crashloop-missing-perms

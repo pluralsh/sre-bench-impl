@@ -1,62 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "stateless.fullname" . }}
+  name: test-app
+  namespace: istio-system
   labels:
-    app.kubernetes.io/name: {{ include "stateless.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app: test-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "stateless.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app: test-app
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "stateless.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app: test-app
       annotations:
         sidecar.istio.io/inject: "true"  # This will trigger sidecar injection
     spec:
-      serviceAccountName: {{ include "stateless.serviceAccountName" . }}
       containers:
-      - name: example-app
+      - name: nginx
         image: nginx:latest
         ports:
-        - name: http
-          containerPort: 80
+        - containerPort: 80
 ---
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
+apiVersion: v1
+kind: Service
 metadata:
-  name: example-gateway
+  name: test-app
+  namespace: istio-system
 spec:
   selector:
-    istio: ingressgateway
-  servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "*"
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: example-virtualservice
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - example-gateway
-  http:
-  - match:
-    - uri:
-        prefix: "/"
-    route:
-    - destination:
-        host: {{ include "stateless.fullname" . }}  # Using the stateless service name
-        port:
-          number: {{ .Values.service.port }}
+    app: test-app
+  ports:
+  - port: 80
+    targetPort: 80

@@ -1,0 +1,38 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: ServiceDeployment
+metadata:
+  name: istio-operator-missing-perms
+spec:
+  namespace: istio-system
+  helm:
+    url: https://istio-release.storage.googleapis.com/charts
+    chart: istiod
+    version: '1.20.0'  # Using a stable version
+    values:
+      pilot:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        serviceAccount:
+          create: true
+          # Intentionally missing permissions for:
+          # - configmaps (needed for sidecar injection)
+          # - mutatingwebhookconfigurations (needed for sidecar injection)
+          # - deployments (needed for proxy deployment)
+          rules:
+          - apiGroups: ["networking.istio.io"]
+            resources: ["virtualservices", "destinationrules", "gateways"]
+            verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+          - apiGroups: ["security.istio.io"]
+            resources: ["authorizationpolicies", "peerauthentications"]
+            verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+          - apiGroups: [""]
+            resources: ["services", "endpoints", "pods"]
+            verbs: ["get", "list", "watch"]
+  clusterRef:
+    name: test
+    namespace: sre-bench

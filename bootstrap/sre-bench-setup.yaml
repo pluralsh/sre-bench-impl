@@ -1,0 +1,17 @@
+apiVersion: deployments.plural.sh/v1alpha1
+kind: ServiceDeployment
+metadata:
+  name: sre-bench-setup
+spec:
+  namespace: sre-bench
+  git:
+    ref: main
+    folder: bootstrap
+  configuration:
+    clusterHandle: boot-staging
+  repositoryRef:
+    name: sre-bench
+    namespace: infra
+  clusterRef:
+    name: boot-staging
+    namespace: infra
